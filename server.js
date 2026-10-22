@@ -37,7 +37,7 @@ app.use(
 // Setup express-session with existing Mongoose connection
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || 'dev-secret', //added a fallback secret key to void crashing if .env file doesnt have secret key
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
