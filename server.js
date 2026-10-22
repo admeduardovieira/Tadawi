@@ -68,8 +68,15 @@ app.use('/api/ai-chat', AIChatRouter);
 // protect html pages
 app.use(protectHtmlPages);
 
-// serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// serve uploaded files (protected)
+app.use('/uploads', async (req, res, next) => {
+  try {
+    await (await import('./lib/check-auth.js')).checkAuth(req, ['doctor', 'patient', 'donorAcquirer']);
+    next();
+  } catch (e) {
+    res.status(401).send('Unauthorized');
+  }
+}, express.static(path.join(__dirname, 'uploads')));
 
 // Serve static assets(html, css, and images used in website)
 app.use(express.static(path.join(__dirname, 'public')));
