@@ -44,7 +44,9 @@ export async function updateMyProfile(request) {
     if (requestBody.patientDetails.idVerification) {
       requestBody.patientDetails.idVerification = await handleBase64Upload(
         requestBody.patientDetails.idVerification,
-        randomBytes(16).toString('hex')
+        randomBytes(16).toString('hex'),
+        authUser._id.toString(),
+        authUser.userType
       );
     }
 
@@ -59,7 +61,9 @@ export async function updateMyProfile(request) {
     if (requestBody.doctorDetails.license) {
       requestBody.doctorDetails.license = await handleBase64Upload(
         requestBody.doctorDetails.license,
-        randomBytes(16).toString('hex')
+        randomBytes(16).toString('hex'),
+        authUser._id.toString(),
+        authUser.userType
       );
     }
     await UserModel.updateDoctorUser(authUser._id.toString(), {

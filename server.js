@@ -68,10 +68,16 @@ app.use('/api/ai-chat', AIChatRouter);
 // protect html pages
 app.use(protectHtmlPages);
 
-// serve uploaded files (protected)
+// serve uploaded files (protected + ownership check)
 app.use('/uploads', async (req, res, next) => {
   try {
-    await (await import('./lib/check-auth.js')).checkAuth(req, ['doctor', 'patient', 'donorAcquirer']);
+    const authUser = await (await import('./lib/check-auth.js')).checkAuth(req, ['doctor', 'patient', 'donorAcquirer']);
+    const filename = req.path.replace(/^\//, '');
+    const { UploadModel } = await import('./models/upload.model.js');
+    const record = await UploadModel.findOne({ filename });
+    if (record && record.ownerId.toString() !== authUser._id.toString()) {
+      return res.status(403).send('Forbidden');
+    }
     next();
   } catch (e) {
     res.status(401).send('Unauthorized');
